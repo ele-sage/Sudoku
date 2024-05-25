@@ -1,0 +1,38 @@
+.square {
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  font-size: 40px;
+  font-weight: bold;
+  line-height: 50px;
+  height: 50px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 50px;
+}
+
+.square.possible {
+  border-radius: 5px;
+}
+
+.square.possible:hover {
+  background-color: #c1c1c1;
+}
+
+.possible-values {
+  padding: 20px;
+}
+
+.square.changeable {
+  background-color: #e0e0e0;
+}
+
+.square.changeable:hover {
+  background-color: #c1c1c1;
+}
+
+.square.changeable.selected {
+  background-color: rgb(168, 252, 252);
+}

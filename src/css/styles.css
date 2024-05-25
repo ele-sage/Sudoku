@@ -1,0 +1,122 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  margin: 20px;
+  padding: 0;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 22px;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+h3 {
+  margin-top: 0;
+  font-size: 18px;
+}
+
+h4 {
+  margin-top: 0;
+  font-size: 16px;
+}
+
+h5 {
+  margin-top: 0;
+  font-size: 14px;
+}
+
+h6 {
+  margin-top: 0;
+  font-size: 12px;
+}
+
+code {
+  font-size: 1.2em;
+}
+
+ul {
+  padding-inline-start: 20px;
+}
+
+.completed {
+  font-size: 40px;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sudoku {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.board-and-button {
+  display: flex;
+  align-items: center;
+}
+
+.tictactoe {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.board {
+  display: inline-grid;
+  grid-template-columns: repeat(9, 1fr);
+}
+
+.board > .square:nth-child(9n + 4) {
+  border-left: 2px solid #000;
+}
+
+.board > .square:nth-child(9n + 7) {
+  border-left: 2px solid #000;
+}
+
+.board > .square:nth-child(28),
+.board > .square:nth-child(29),
+.board > .square:nth-child(30),
+.board > .square:nth-child(31),
+.board > .square:nth-child(32),
+.board > .square:nth-child(33),
+.board > .square:nth-child(34),
+.board > .square:nth-child(35),
+.board > .square:nth-child(36) {
+  border-top: 2px solid #000; /* Thicker top border for the middle row */
+}
+
+.board > .square:nth-child(55),
+.board > .square:nth-child(56),
+.board > .square:nth-child(57),
+.board > .square:nth-child(58),
+.board > .square:nth-child(59),
+.board > .square:nth-child(60),
+.board > .square:nth-child(61),
+.board > .square:nth-child(62),
+.board > .square:nth-child(63) {
+  border-top: 2px solid #000; /* Thicker bottom border for the middle row */
+}
+
+.status {
+  margin-bottom: 10px;
+}
+
+.game-info {
+  margin-left: 20px;
+}
