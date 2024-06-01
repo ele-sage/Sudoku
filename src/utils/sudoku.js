@@ -35,7 +35,6 @@ class Sudoku {
         this.squares[i][j].reset(subgridIndex, [i, j]);
       }
     }
-    this.squareUpdated = null;
     this.emptySquares = numToRemove;
     this.removedSquareSet = [];
     this.changeableSquares = new Array(81).fill(false);
@@ -73,7 +72,7 @@ class Sudoku {
     return notUsed;
   }
 
-  getSquares(dimension) {
+  getSquares(dimension = 2) {
     if (dimension === 1) {
       const values = [];
       for (let i = 0; i < SIZE; i++)
@@ -105,7 +104,6 @@ class Sudoku {
   // with a given number of squares to remove
   // ********************************************************************
   generateGrid(numToRemove) {
-    this.squareUpdated = null;
     this.emptySquares = numToRemove;
     this.resetGrid();
     while (!this.solveGrid(true)) this.resetGrid();

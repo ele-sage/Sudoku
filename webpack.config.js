@@ -1,15 +1,14 @@
 const path = require("path");
 
 module.exports = {
-  entry: path.resolve(__dirname, "src", "App.jsx"),
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "bundle.js",
+    filename: "main.js",
   },
   devServer: {
     static: path.resolve(__dirname, "public"),
     open: true,
-    client: false,
     port: 9000,
   },
   module: {
@@ -34,7 +33,9 @@ module.exports = {
                 [
                   "@babel/preset-react",
                   {
-                    runtime: "automatic",
+                    runtime: 'automatic',
+                    development: process.env.NODE_ENV === 'development',
+                    importSource: '@welldone-software/why-did-you-render',
                   },
                 ],
               ],
