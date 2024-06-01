@@ -1,4 +1,7 @@
+import Square from "./square";
+
 const SIZE = 9;
+const SEED_SQUARE = 3;
 const CELL_COORD = new Map([
   [0, [0, 0]],
   [1, [0, 3]],
@@ -21,7 +24,7 @@ function generateRandomSet(setSize) {
   return Array.from(numbers);
 }
 
-export default class Sudoku {
+class Sudoku {
   constructor(numToRemove) {
     this.squares = Array.from({ length: SIZE }, () =>
       Array.from({ length: SIZE }, () => new Square())
@@ -32,21 +35,22 @@ export default class Sudoku {
         this.squares[i][j].reset(subgridIndex, [i, j]);
       }
     }
+    this.squareUpdated = null;
     this.emptySquares = numToRemove;
     this.removedSquareSet = [];
-    this.generateGrid(numToRemove);
     this.changeableSquares = new Array(81).fill(false);
     this.setChangeableSquares();
+    this.generateGrid(numToRemove);
   }
 
+  // Methods used by the Game component
+  // ********************************************************************
   isChangeableSquare(i) {
     return this.changeableSquares[i];
   }
 
-  setChangeableSquares() {
-    this.removedSquareSet.forEach((index) => {
-      this.changeableSquares[index] = true;
-    });
+  getSquareValue(i, j) {
+    return this.squares[i][j].getValue();
   }
 
   getPossibleValues(i, j) {
@@ -65,6 +69,7 @@ export default class Sudoku {
       );
     }
     const notUsed = numbers.filter((num) => !used.has(num));
+    notUsed.push(0);
     return notUsed;
   }
 
@@ -96,6 +101,35 @@ export default class Sudoku {
     return true;
   }
 
+  // Methods used to generate a playable Sudoku grid (a grid with at least one solution)
+  // with a given number of squares to remove
+  // ********************************************************************
+  generateGrid(numToRemove) {
+    this.squareUpdated = null;
+    this.emptySquares = numToRemove;
+    this.resetGrid();
+    while (!this.solveGrid(true)) this.resetGrid();
+    this.removedSquareSet = generateRandomSet(numToRemove);
+    this.removeSquares();
+    this.changeableSquares.fill(false)
+    this.setChangeableSquares();
+  }
+
+  solveGrid(create) {
+    if (create) this.setRandomSquares();
+
+    for (let k = 0; k < SIZE * SIZE - SEED_SQUARE; k++) {
+      const pos = this.lessPossibleValues();
+
+      if (pos === false) return false;
+      const squareValue = this.squares[pos[0]][pos[1]].setRandomValue();
+      if (squareValue === false) return false;
+      this.removePossibleValues(pos[0], pos[1], squareValue);
+    }
+    return true;
+  }
+
+  // Remove possible values from row, column and subgrid, when a value is set
   removePossibleValues(i, j, value) {
     const cell = this.squares[i][j].getCell();
     const coord = CELL_COORD.get(cell);
@@ -109,6 +143,7 @@ export default class Sudoku {
     }
   }
 
+  // Find the square with the least possible values
   lessPossibleValues() {
     let pos = [0, 0];
     let lowest = 10;
@@ -127,47 +162,16 @@ export default class Sudoku {
     return pos;
   }
 
-  solve(create) {
-    const randoms = generateRandomSet(5);
-    let pos = [0, 0];
-
-    for (let k = 0; k < SIZE * SIZE; k++) {
-      if (k < 5 && create === true) {
-        pos[0] = randoms[k] % SIZE;
-        pos[1] = Math.floor(randoms[k] / SIZE);
-      } else pos = this.lessPossibleValues();
-      if (pos === false) return false;
-      const squareValue = this.squares[pos[0]][pos[1]].setRandomValue();
+  setRandomSquares() {
+    const randoms = generateRandomSet(SEED_SQUARE);
+    
+    for (let k = 0; k < SEED_SQUARE; k++) {
+      const i = randoms[k] % SIZE;
+      const j = Math.floor(randoms[k] / SIZE);
+      const squareValue = this.squares[i][j].setRandomValue();
       if (squareValue === false) return false;
-      this.removePossibleValues(pos[0], pos[1], squareValue);
+      this.removePossibleValues(i, j, squareValue);
     }
-    return true;
-  }
-
-  generateGrid(numToRemove) {
-    this.resetGrid();
-    while (!this.solve(true)) {
-      // this.printGrid();
-      this.resetGrid();
-    }
-    // this.printGrid();
-    this.removedSquareSet = generateRandomSet(numToRemove);
-    this.removeSquares();
-  }
-
-  printGrid() {
-    console.log();
-    for (let i = 0; i < SIZE; i++) {
-      let row = "";
-      for (let j = 0; j < SIZE; j++) {
-        row += this.squares[i][j].getValue() + " ";
-        if ((j + 1) % 3 === 0 && j + 1 < SIZE) row += "| ";
-      }
-      console.log(row.trim());
-      if ((i + 1) % 3 === 0 && i + 1 < SIZE)
-        console.log("------+-------+------");
-    }
-    console.log();
   }
 
   resetGrid() {
@@ -186,63 +190,28 @@ export default class Sudoku {
       ].removeValue();
     }
   }
-}
 
-class Square {
-  constructor() {
-    this.possible = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    this.value = 0;
-    this.cell = 0;
-    this.pos = [0, 0];
+  setChangeableSquares() {
+    this.removedSquareSet.forEach((index) => {
+      this.changeableSquares[index] = true;
+    });
   }
 
-  reset(cell, pos) {
-    this.possible = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    this.value = 0;
-    this.cell = cell;
-    this.pos = pos;
-  }
-
-  removeValue() {
-    this.value = 0;
-  }
-
-  setRandomValue() {
-    if (this.possible.length === 0) return false;
-    const randomIndex = Math.floor(Math.random() * this.possible.length);
-    this.value = this.possible.splice(randomIndex, 1)[0];
-    return this.value;
-  }
-
-  setValue(value) {
-    this.value = value;
-  }
-
-  getValue() {
-    return this.value;
-  }
-
-  getCell() {
-    return this.cell;
-  }
-
-  resetPossibleValue() {
-    this.possible = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  }
-
-  getPossibleValue() {
-    return this.possible;
-  }
-
-  getSizePossibleValue() {
-    let size = this.possible.length;
-    if (this.value !== 0) size = 10;
-    return size;
-  }
-
-  removePossibleValue(value) {
-    if (this.value !== 0) return;
-    const index = this.possible.indexOf(value);
-    if (index !== -1) this.possible.splice(index, 1);
+  // Utils
+  printGrid() {
+    console.log();
+    for (let i = 0; i < SIZE; i++) {
+      let row = "";
+      for (let j = 0; j < SIZE; j++) {
+        row += this.squares[i][j].getValue() + " ";
+        if ((j + 1) % 3 === 0 && j + 1 < SIZE) row += "| ";
+      }
+      console.log(row.trim());
+      if ((i + 1) % 3 === 0 && i + 1 < SIZE)
+        console.log("------+-------+------");
+    }
+    console.log();
   }
 }
+
+export default Sudoku;

@@ -33,6 +33,6 @@
   background-color: #c1c1c1;
 }
 
-.square.changeable.selected {
+.square.changeable:focus {
   background-color: rgb(168, 252, 252);
 }
